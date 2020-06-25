@@ -31,14 +31,11 @@ function app() {
     let user = document.getElementById("feelings").value;
     getData(url, zip, api).then(function(data) {
         postData('/add', { city: data.name, temperature: data.main.temp, date: newDate, user_response: user }).then(function(data) {
-            updateGUI();
+            retieveData();
         });
     });
 }
 
-function updateGUI() {
-    retieveData();
-}
 
 const retieveData = async() => {
     const req = await fetch("/all");

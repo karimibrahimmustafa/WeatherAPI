@@ -3,7 +3,7 @@
 // Create a new date instance dynamically with JS
 let d = new Date();
 let newDate = d.getMonth() + '.' + d.getDate() + '.' + d.getFullYear();
-const api = "02f0213a86ba7ad6b6268154ca020f86";
+const api = "02f0213a86ba7ad6b6268154ca020f86&units=imperial";
 const url = "http://api.openweathermap.org/data/2.5/weather?zip=";
 const postData = async(url = '', data = {}) => {
     // console.log(data);
@@ -31,17 +31,29 @@ function app() {
     let user = document.getElementById("feelings").value;
     getData(url, zip, api).then(function(data) {
         postData('/add', { city: data.name, temperature: data.main.temp, date: newDate, user_response: user }).then(function(data) {
-            updateGUI(data.city, data.temperature, data.date, data.user_response);
+            updateGUI();
         });
     });
 }
 
-function updateGUI(city, temp, date, user) {
-    document.getElementById('date').innerHTML = 'Date: ' + date;
-    document.getElementById('city').innerHTML = 'City: ' + city;
-    document.getElementById('temp').innerHTML = 'Temp: ' + ((temp) * (9 / 5) - 459.67).toFixed(1) + ' F';
-    // document.getElementById('description').innerHTML ='Forecast: ' + allData.description; 
-    document.getElementById('content').innerHTML = 'Feeling: ' + user;
+function updateGUI() {
+    retieveData();
+}
+
+const retieveData = async() => {
+    const req = await fetch("/all");
+    try {
+        const allData = await req.json();
+        length = Object.keys(allData).length - 1;
+        console.log(allData);
+        document.getElementById('date').innerHTML = 'Date: ' + allData[length].date;
+        document.getElementById('city').innerHTML = 'City: ' + allData[length].city;
+        document.getElementById('temp').innerHTML = 'Temp: ' + Math.round(allData[length].temperature) + "degree";
+        document.getElementById('content').innerHTML = 'Feeling: ' + allData[length].user_response;
+    } catch (error) {
+        console.log("error", error);
+    }
+
 }
 const getData = async(url, zip, api) => {
     const res = await fetch(url + zip + "&APPID=" + api);
